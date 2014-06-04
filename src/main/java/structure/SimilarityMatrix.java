@@ -48,7 +48,6 @@ import slib.sml.sm.core.metrics.ic.utils.ICconf;
 import slib.sml.sm.core.metrics.ic.utils.IcUtils;
 import slib.utils.ex.SLIB_Ex_Critic;
 import slib.utils.ex.SLIB_Exception;
-import tools.Config;
 import tools.MeasuresConf;
 
 /**
@@ -69,18 +68,9 @@ public class SimilarityMatrix {
     private double[] BMAs;
     private ArrayList<Integer> modifiedIdColMax;
     private int lastRemovedConcept;
-    private double sumIC;
     
     SM_Engine engine = Index.getInstance().getEngineManager().getEngine();
     ICconf ICconf = MeasuresConf.getMeasure().getICconf();
-
-    /**
-     *
-     * @return
-     */
-    public double getSumIC() {
-        return sumIC;
-    }
 
     /**
      *
@@ -226,7 +216,6 @@ public class SimilarityMatrix {
         A0 = new ArrayList(unionConcepts); // Columns
         neighbours = new ArrayList(); // Rows
         modifiedIdColMax = new ArrayList();
-        sumIC = 0.;
 
         HashSet<URI> tmp = new HashSet();
         for (LinkedHashSet neighbour : annotatedNeighbours) {
@@ -246,7 +235,6 @@ public class SimilarityMatrix {
         // Also filling columnIndex/rowIndex to fit with sim_annotation_entities
         for (int c_i = 0; c_i < this.A0.size(); c_i++) {
             URI conceptCol = A0.get(c_i);
-            sumIC += engine.getIC(ICconf, conceptCol);
             columnIndex.put(conceptCol, c_i);
             validConcepts.add(c_i);
             for (int r_i = 0; r_i < neighbours.size(); r_i++) {
@@ -349,7 +337,6 @@ public class SimilarityMatrix {
         lastRemovedConcept = toRemove;
         modifiedIdColMax.clear();
         validConcepts.remove((Integer) toRemove);
-        sumIC -= engine.getIC(ICconf, A0.get(toRemove));
         for (int r_i = 0; r_i < idColMaxForThisRow.length; r_i++) {
             if (idColMaxForThisRow[r_i] == toRemove) {
                 updateIdColMax(r_i, conceptIDToDocID.get(r_i), true);
@@ -393,7 +380,6 @@ public class SimilarityMatrix {
      */
     public void restoreLastRemovedConcept() throws SLIB_Exception {
         validConcepts.add(lastRemovedConcept);
-        sumIC += engine.getIC(ICconf, A0.get(lastRemovedConcept));
         for (int r_i : modifiedIdColMax) {
             restoreIdColMax(r_i, conceptIDToDocID.get(r_i), true);
         }

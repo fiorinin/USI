@@ -187,15 +187,9 @@ public class BestMatchAverage {
         int i;
         for (i = 0; i < sims.length; i++) {
             double s = sims[i];
-//            double expectedSim = distances.get(i);
-//            double error = (s - expectedSim)*(s - expectedSim);
-//            similarity += 1-error;
-//            similarity += s * (1-expectedSim/Math.sqrt(2));
-//            similarity += s * expectedSim; // pas si mal en fait
             similarity += s;
         }
         double cardA = similarityMatrix.getValidConcepts().size();
-        double cardA0 = similarityMatrix.getA0().size();
-        return (similarity / i) - objectiveFunctionMargin * (cardA/cardA0);
+        return (similarity / i) - objectiveFunctionMargin * cardA;
     }
 }
