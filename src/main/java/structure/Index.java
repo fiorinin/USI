@@ -62,6 +62,7 @@ import slib.sml.sm.core.metrics.ic.utils.ICconf;
 import slib.sml.sm.core.metrics.ic.utils.IcUtils;
 import slib.utils.ex.SLIB_Exception;
 import tools.MeasuresConf;
+import tools.USI_IO;
 import tools.Utils;
 
 /**
@@ -184,7 +185,7 @@ public class Index {
     public void init(String ontologyPath, String indexPath, String IDGetterPath) throws SLIB_Ex_Critic {
         if (engineManager == null) {
             try {
-                engineManager = new EngineOverlay(ontologyPath);
+                engineManager = USI_IO.loadMeSH(ontologyPath);
                 idg = new IDGetter(IDGetterPath);
                 if (!indexPath.equals("")) {
                     byte[] encoded = Files.readAllBytes(Paths.get(indexPath));
@@ -433,7 +434,7 @@ public class Index {
      * @throws SLIB_Ex_Critic
      * @throws SLIB_Exception
      */
-    public double[][] computeSquareSimilarityMatrix(String path, ArrayList<String> arr, boolean reverse) throws SLIB_Ex_Critic, SLIB_Exception {
+    public double[][] computeSquareSimilarityMatrix(String path, ArrayList<String> arr) throws SLIB_Ex_Critic, SLIB_Exception {
         ArrayList<Entity> temp = getEntitiesById(arr);
 //        return computeGroupwiseSimilarityMatrix(path, temp, temp, reverse);
         return computeOptimizedDissimilarityMatrix(temp);

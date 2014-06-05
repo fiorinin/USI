@@ -97,19 +97,8 @@ public class EngineOverlay {
      * @param ontologyFilePath
      * @throws SLIB_Exception
      */
-    public EngineOverlay(String ontologyFilePath) throws SLIB_Exception {
+    public EngineOverlay(G ontologyGraph, String ontologyFilePath, String b) throws SLIB_Exception {
         URIFactoryMemory factory = URIFactoryMemory.getSingleton();
-        String b = "http://usi";
-        URI uri = factory.createURI(b);
-        G ontologyGraph = new GraphMemory(uri);
-        GDataConf dataMeshXML = new GDataConf(GFormat.MESH_XML, ontologyFilePath); // the DTD must be located in the same directory
-        dataMeshXML.addParameter("prefix", b + "/");
-        try {
-            GraphLoaderGeneric.populate(dataMeshXML, ontologyGraph);
-        } catch (SLIB_Exception e) {
-            e.printStackTrace();
-        }
-        removeMeshCycles(ontologyGraph);
         sme = new SM_Engine(ontologyGraph);
         Indexer_MESH_XML indexer = new Indexer_MESH_XML();
         ih = indexer.buildIndex(factory, ontologyFilePath, b + "/");
@@ -148,53 +137,6 @@ public class EngineOverlay {
             return sme.computePairwiseSim(MeasuresConf.getMeasure(), u1, u2);
         } catch (SLIB_Ex_Critic ex) {
             return 0.;
-        }
-    }
-
-    /*
-     * We remove the cycles of the graph in order to obtain 
-     * a rooted directed acyclic graph (DAG) and therefore be able to 
-     * use most of semantic similarity measures.
-     * see http://semantic-measures-library.org/sml/index.php?q=doc&page=mesh
-     */
-    private void removeMeshCycles(G meshGraph) throws SLIB_Ex_Critic {
-        URIFactoryMemory factory = URIFactoryMemory.getSingleton();
-
-        // We remove the edges creating cycles
-        URI ethicsURI = factory.createURI(meshGraph.getURI().stringValue() + "/D004989");
-        URI moralsURI = factory.createURI(meshGraph.getURI().stringValue() + "/D009014");
-
-        // We retrieve the direct subsumers of the concept (D009014)
-        Set<E> moralsEdges = meshGraph.getE(RDFS.SUBCLASSOF, moralsURI, Direction.OUT);
-        for (E e : moralsEdges) {
-
-            System.out.println("\t" + e);
-            if (e.getTarget().equals(ethicsURI)) {
-                System.out.println("\t*** Removing edge " + e);
-                meshGraph.removeE(e);
-            }
-        }
-
-        ValidatorDAG validatorDAG = new ValidatorDAG();
-        boolean isDAG = validatorDAG.containsTaxonomicDag(meshGraph);
-
-        System.out.println("MeSH Graph is a DAG: " + isDAG);
-
-        // We remove the edges creating cycles
-        // see http://semantic-measures-library.org/sml/index.php?q=doc&page=mesh
-
-        URI hydroxybutyratesURI = factory.createURI(meshGraph.getURI().stringValue() + "/D006885");
-        URI hydroxybutyricAcidURI = factory.createURI(meshGraph.getURI().stringValue() + "/D020155");
-
-        // We retrieve the direct subsumers of the concept (D009014)
-        Set<E> hydroxybutyricAcidEdges = meshGraph.getE(RDFS.SUBCLASSOF, hydroxybutyricAcidURI, Direction.OUT);
-        for (E e : hydroxybutyricAcidEdges) {
-
-            System.out.println("\t" + e);
-            if (e.getTarget().equals(hydroxybutyratesURI)) {
-                System.out.println("\t*** Removing edge " + e);
-                meshGraph.removeE(e);
-            }
         }
     }
 
