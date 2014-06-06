@@ -56,22 +56,21 @@ import slib.utils.ex.SLIB_Exception;
  * @author Nicolas Fiorini <nicolas.fiorini@mines-ales.fr> / <contact@creatox.com>
  */
 public class USI_IO {
-
-    public static EngineOverlay loadMeSH(String ontologyFilePath) throws SLIB_Ex_Critic, SLIB_Exception {
-        URIFactoryMemory factory = URIFactoryMemory.getSingleton();
+    
+    public static EngineOverlay loadGraph(String ontologyFilePath, GFormat gFormat) throws SLIB_Ex_Critic, SLIB_Exception {
+         URIFactoryMemory factory = URIFactoryMemory.getSingleton();
         String b = "http://usi";
         URI uri = factory.createURI(b);
         G ontologyGraph = new GraphMemory(uri);
-        GDataConf dataMeshXML = new GDataConf(GFormat.MESH_XML, ontologyFilePath);
+       
+        GDataConf dataMeshXML = new GDataConf(gFormat, ontologyFilePath);
         dataMeshXML.addParameter("prefix", b + "/");
-        try {
-            GraphLoaderGeneric.populate(dataMeshXML, ontologyGraph);
-        } catch (SLIB_Exception e) {
-            e.printStackTrace();
-        }
-        removeMeshCycles(ontologyGraph);
+        GraphLoaderGeneric.populate(dataMeshXML, ontologyGraph);
+        if(gFormat.equals(GFormat.MESH_XML))
+            removeMeshCycles(ontologyGraph);
+        
         return new EngineOverlay(ontologyGraph, ontologyFilePath, b);
-    }    
+    }
 
     /*
      * We remove the cycles of the graph in order to obtain 

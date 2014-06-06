@@ -55,6 +55,7 @@ import org.apache.commons.collections.Predicate;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import slib.sglib.io.util.GFormat;
 import slib.sglib.model.impl.repo.URIFactoryMemory;
 import slib.sml.sm.core.engine.SM_Engine;
 import slib.sml.sm.core.measures.graph.pairwise.dag.node_based.Sim_pairwise_DAG_node_Lin_1998;
@@ -71,7 +72,6 @@ import tools.Utils;
  */
 public class Index {
 
-    private IDGetter idg;
     private ArrayList<Entity> index = new ArrayList();
     private HashMap<URI, Integer> idf = new HashMap();
     private EngineOverlay engineManager;
@@ -79,14 +79,6 @@ public class Index {
      *
      */
     public static Index instance = null;
-
-    /**
-     *
-     * @return
-     */
-    public IDGetter getIDG() {
-        return idg;
-    }
 
     /**
      *
@@ -182,11 +174,10 @@ public class Index {
      * @param IDGetterPath
      * @throws SLIB_Ex_Critic
      */
-    public void init(String ontologyPath, String indexPath, String IDGetterPath) throws SLIB_Ex_Critic {
+    public void init(String ontologyPath, String indexPath, GFormat gFormat) throws SLIB_Ex_Critic {
         if (engineManager == null) {
             try {
-                engineManager = USI_IO.loadMeSH(ontologyPath);
-                idg = new IDGetter(IDGetterPath);
+                engineManager = USI_IO.loadGraph(ontologyPath, gFormat);
                 if (!indexPath.equals("")) {
                     byte[] encoded = Files.readAllBytes(Paths.get(indexPath));
                     String indexJson = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
