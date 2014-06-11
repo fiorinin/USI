@@ -247,7 +247,6 @@ public class Index {
      * @throws SLIB_Ex_Critic
      */
     public double[][] computeIndexSquareSimilarityMatrix(String path, boolean reverse) throws SLIB_Ex_Critic {
-        System.out.println("yaha");
         return computeGroupwiseSimilarityMatrix(path, index, index, reverse);
     }
 
