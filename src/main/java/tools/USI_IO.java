@@ -39,6 +39,11 @@ import java.util.Set;
 import managers.EngineOverlay;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDFS;
+import slib.indexer.IndexHash;
+import slib.indexer.mesh.Indexer_MESH_XML;
+import slib.sglib.algo.graph.utils.GAction;
+import slib.sglib.algo.graph.utils.GActionType;
+import slib.sglib.algo.graph.utils.GraphActionExecutor;
 import slib.sglib.algo.graph.validator.dag.ValidatorDAG;
 import slib.sglib.io.conf.GDataConf;
 import slib.sglib.io.loader.GraphLoaderGeneric;
@@ -57,19 +62,32 @@ import slib.utils.ex.SLIB_Exception;
  */
 public class USI_IO {
     
-    public static EngineOverlay loadGraph(String ontologyFilePath, GFormat gFormat) throws SLIB_Ex_Critic, SLIB_Exception {
-         URIFactoryMemory factory = URIFactoryMemory.getSingleton();
-        String b = "http://usi";
-        URI uri = factory.createURI(b);
-        G ontologyGraph = new GraphMemory(uri);
-       
-        GDataConf dataMeshXML = new GDataConf(gFormat, ontologyFilePath);
-        dataMeshXML.addParameter("prefix", b + "/");
-        GraphLoaderGeneric.populate(dataMeshXML, ontologyGraph);
-        if(gFormat.equals(GFormat.MESH_XML))
-            removeMeshCycles(ontologyGraph);
+    public static EngineOverlay loadGraph(String ontologyFilePath, String descriptorPath, GFormat gFormat, String baseURI) throws SLIB_Ex_Critic, SLIB_Exception {
+        URIFactoryMemory factory = URIFactoryMemory.getSingleton();
+        IndexHash ih = new IndexHash();
+        String b;
+        G ontologyGraph;
         
-        return new EngineOverlay(ontologyGraph, ontologyFilePath, b);
+        if(gFormat.equals(GFormat.MESH_XML)) {
+            b = "http://usi";
+            URI uri = factory.createURI(b);
+            ontologyGraph = new GraphMemory(uri);
+
+            GDataConf data = new GDataConf(gFormat, ontologyFilePath);
+            data.addParameter("prefix", b+"/");
+            GraphLoaderGeneric.populate(data, ontologyGraph);
+            removeMeshCycles(ontologyGraph);
+        } else {
+            b = baseURI;
+            URI uri = factory.createURI(b);
+            ontologyGraph = new GraphMemory(uri);
+            GDataConf data = new GDataConf(gFormat, ontologyFilePath);
+            GraphLoaderGeneric.populate(data, ontologyGraph);
+            GraphActionExecutor.applyAction(factory, new GAction(GActionType.REROOTING), ontologyGraph);
+            ih = Indexer_JSON.buildIndex(factory, descriptorPath, b);
+        } 
+        
+        return new EngineOverlay(ontologyGraph, ontologyFilePath, b, ih);
     }
 
     /*

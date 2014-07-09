@@ -171,13 +171,16 @@ public class Index {
      *
      * @param ontologyPath
      * @param indexPath
+     * @param descriptorPath
+     * @param gFormat
+     * @param basename
      * @param IDGetterPath
      * @throws SLIB_Ex_Critic
      */
-    public void init(String ontologyPath, String indexPath, GFormat gFormat) throws SLIB_Ex_Critic {
+    public void init(String ontologyPath, String descriptorPath, String indexPath, GFormat gFormat, String basename) throws SLIB_Ex_Critic {
         if (engineManager == null) {
             try {
-                engineManager = USI_IO.loadGraph(ontologyPath, gFormat);
+                engineManager = USI_IO.loadGraph(ontologyPath, descriptorPath, gFormat, basename);
                 if (!indexPath.equals("")) {
                     byte[] encoded = Files.readAllBytes(Paths.get(indexPath));
                     String indexJson = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
@@ -189,17 +192,26 @@ public class Index {
                     // Index object = array
                     Object indexObj = json.get("index");
                     JSONArray arrayOfDocuments = (JSONArray) indexObj;
-
                     // Get all element and index them
                     for (int j = 0; j < arrayOfDocuments.size(); j++) {
                         JSONObject docObj = (JSONObject) arrayOfDocuments.get(j);
                         String href = (String) docObj.get("href");
                         String title = (String) docObj.get("title");
-                        String id = "D_" + (Long) docObj.get("id");
+                        String id;
+                        try {
+                            id = "D_" + (Long) docObj.get("id");
+                        } catch(java.lang.ClassCastException e) {
+                            id = (String) docObj.get("id");
+                        }
                         JSONArray annotation = (JSONArray) docObj.get("conceptIds");
                         Set<URI> conceptSet = new HashSet();
                         for (int k = 0; k < annotation.size(); k++) {
-                            conceptSet.add(URIFactoryMemory.getSingleton().createURI(engineManager.getEngine().getGraph().getURI().stringValue() + "/" + (String) annotation.get(k)));
+                            String base = engineManager.getEngine().getGraph().getURI().stringValue();
+                            if(!base.endsWith("/") && !base.endsWith("."))
+                                base += "/";
+                            URI toAdd = URIFactoryMemory.getSingleton().createURI(base + (String) annotation.get(k));
+                            if(!toAdd.getLocalName().equals(getEngineManager().getFromURI(toAdd)))
+                                conceptSet.add(toAdd);
                         }
                         Entity en = new Entity();
                         en.setId(id);

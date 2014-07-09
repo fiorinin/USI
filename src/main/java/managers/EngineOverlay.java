@@ -83,23 +83,27 @@ public class EngineOverlay {
      * @return
      */
     public String getFromURI(URI u) {
-        return ih.valuesOf(u).getPreferredDescription();
+        if(ih.valuesOf(u) != null)
+            return ih.valuesOf(u).getPreferredDescription();
+        else return u.getLocalName();
     }
 
     /**
      *
+     * @param ontologyGraph
      * @param ontologyFilePath
+     * @param b
+     * @param ihtmp
      * @throws SLIB_Exception
      */
-    public EngineOverlay(G ontologyGraph, String ontologyFilePath, String b) throws SLIB_Exception {
+    public EngineOverlay(G ontologyGraph, String ontologyFilePath, String b, IndexHash ihtmp) throws SLIB_Exception {
         URIFactoryMemory factory = URIFactoryMemory.getSingleton();
         sme = new SM_Engine(ontologyGraph);
-        Indexer_MESH_XML indexer = new Indexer_MESH_XML();
-        ih = indexer.buildIndex(factory, ontologyFilePath, b + "/");
+        ih = ihtmp;
         System.out.println("Index of URIs done.");
         Set<URI> uris = sme.getClasses();
         for (URI u : uris) {
-            if (u != null && ih.valuesOf(u) != null && ih.valuesOf(u).getPreferredDescription() != null) {
+            if (u != null && ih != null && ih.valuesOf(u) != null && ih.valuesOf(u).getPreferredDescription() != null) {
                 labels.put(ih.valuesOf(u).getPreferredDescription().toLowerCase(), u);
             }
         }
