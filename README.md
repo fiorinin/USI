@@ -1,7 +1,7 @@
 USI
 ===
 
-Universal Semantic Indexer
+User-oriented Semantic Indexer
 
 ===
 
