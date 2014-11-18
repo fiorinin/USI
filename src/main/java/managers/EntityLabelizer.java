@@ -201,29 +201,8 @@ public class EntityLabelizer {
                 Point p = e.getP();
                 neighbours.put(p.getLabel(), e.getDist());
             }
-            // DEPRECATED
-//            }
-//        } else {
-//            while (it.hasNext()) {
-//                PointDist e = (PointDist) it.next();
-//                if (e.getDist() < radiusWidth && neighbours.size() < neighboursNumberMax) {
-//                    Point p = e.getP();
-//                    neighbours.put(p.getLabel(), e.getDist());
-//                } else {
-//                    if (neighbours.size() < neighboursNumberMin) {
-//                        Point p = e.getP();
-//                        neighbours.put(p.getLabel(), e.getDist());
-//                    } else {
-//                        break;
-//                    }
-//                }
-//            }
         }
         int neighbors = neighbours.size();
-        // similarityThreshold changes according to number of neighbours
-//        if (similarityThreshold != 0.) {
-//            similarityThreshold = 0.85 + (neighbors - 5) * (0.1 / 15);
-//        }
         return neighbors;
     }
 
@@ -244,24 +223,6 @@ public class EntityLabelizer {
         }
         for (Entry<String, Double> e : loopOn.entrySet()) {
             Set<URI> c = Index.getInstance().getEntityById(e.getKey()).getConcepts();
-            // DEPRECATED
-//                if (expansion) {
-//                    Set<URI> neighbourURIs = new HashSet();
-//                    for (URI u : c) {
-//                        try {
-//                            neighbourURIs.addAll(em.findNeighboringConcepts(u, similarityThreshold));
-//                        } catch (SLIB_Ex_Critic ex) {
-//                            continue;
-//                        }
-//                    }
-//                    for (URI ne : neighbourURIs) {
-//                        if (tf.containsKey(ne)) {
-//                            tf.put(ne, tf.get(ne) + 1);
-//                        } else {
-//                            tf.put(ne, 1.0);
-//                        }
-//                    }
-//                } else {
             for (URI u : c) {
                 if (tf.containsKey(u)) {
                     tf.put(u, tf.get(u) + 1);
@@ -269,7 +230,6 @@ public class EntityLabelizer {
                     tf.put(u, 1.0);
                 }
             }
-//                }
         }
         A0.clear();
         if (filter == 0) {
@@ -325,6 +285,31 @@ public class EntityLabelizer {
         LinkedHashSet<URI> annotation = new LinkedHashSet();
         annotation.addAll(getBaseAnnotation());
         // Annotated
+
+        ArrayList<LinkedHashSet<URI>> neighbourhood = new ArrayList();
+        ArrayList<Double> distances = new ArrayList();
+        for (Entry<String, Double> c : neighbours.entrySet()) {
+            LinkedHashSet<URI> entityURIs = new LinkedHashSet();
+            entityURIs.addAll(Index.getInstance().getEntityById(c.getKey()).getConcepts());
+            distances.add(1 - (c.getValue() * weightCoeff)); // Similarity for a given distance on map
+//                distances.add(c.getValue()); // Distance on map
+            neighbourhood.add(entityURIs);
+        }
+        SimilarityMatrix similarityMatrix = new SimilarityMatrix(annotation, neighbourhood);
+        BestMatchAverage labels_BMA = new BestMatchAverage(annotation, neighbourhood, distances, ObjectiveFunctionMargin, map, similarityMatrix);
+        finalScore = labels_BMA.labelize();
+        return labels_BMA.getAnnotations();
+    }
+
+    /**
+     *
+     * @param annotation
+     * @param neighbours
+     * @return
+     * @throws SLIB_Ex_Critic
+     * @throws SLIB_Exception
+     */
+    public Set<URI> labelize(LinkedHashSet<URI> annotation, LinkedHashMap<String, Double> neighbours) throws SLIB_Ex_Critic, SLIB_Exception {
 
         ArrayList<LinkedHashSet<URI>> neighbourhood = new ArrayList();
         ArrayList<Double> distances = new ArrayList();

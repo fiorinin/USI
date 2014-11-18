@@ -57,7 +57,6 @@ public class BestMatchAverage {
     private LinkedHashSet<URI> annotations;
     private double objectiveFunctionMargin;
     private boolean map;
-    private double weightCoeff;
     private Set<URI> trueAnnot;
     SimilarityMatrix similarityMatrix;
 
@@ -94,7 +93,6 @@ public class BestMatchAverage {
         distances = d;
         neighbourhood = neighb;
         this.objectiveFunctionMargin = ObjectiveFunctionMargin;
-        this.weightCoeff = weightCoeff;
         annotations = ann;
     }
 
