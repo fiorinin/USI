@@ -63,7 +63,7 @@ public class MeasuresConf {
         //ICconf icConf = new IC_Conf_Topo(SMConstants.FLAG_ICI_RESNIK_1995);
 
         // Lin indirect
-        SMconf similarityMeasureConf = new SMconf("", SMConstants.FLAG_SIM_PAIRWISE_DAG_NODE_LIN_1998, icConf);
+        SMconf similarityMeasureConf = new SMconf(SMConstants.FLAG_SIM_PAIRWISE_DAG_NODE_LIN_1998, icConf);
         //SMconf similarityMeasureConf = new SMconf("", SMConstants.FLAG_ICI_RESNIK_1995, icConf);
 
         // Schlicker indirect
@@ -85,7 +85,7 @@ public class MeasuresConf {
     public static SMconf getAgreg() throws SLIB_Ex_Critic {
         icConf = new IC_Conf_Topo(SMConstants.FLAG_ICI_SECO_2004);
         // BMA
-        SMconf similarityMeasureConf = new SMconf("", SMConstants.FLAG_SIM_GROUPWISE_BMA, icConf);
+        SMconf similarityMeasureConf = new SMconf(SMConstants.FLAG_SIM_GROUPWISE_BMA, icConf);
         return similarityMeasureConf;
     }
 }

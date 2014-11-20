@@ -162,6 +162,10 @@ public class EntityLabelizer {
         return neighbours;
     }
 
+    public void setNeighboursNumberMin(int neighboursNumberMin) {
+        this.neighboursNumberMin = neighboursNumberMin;
+    }
+
     /**
      *
      * @param clusterSizeMin
@@ -285,31 +289,6 @@ public class EntityLabelizer {
         LinkedHashSet<URI> annotation = new LinkedHashSet();
         annotation.addAll(getBaseAnnotation());
         // Annotated
-
-        ArrayList<LinkedHashSet<URI>> neighbourhood = new ArrayList();
-        ArrayList<Double> distances = new ArrayList();
-        for (Entry<String, Double> c : neighbours.entrySet()) {
-            LinkedHashSet<URI> entityURIs = new LinkedHashSet();
-            entityURIs.addAll(Index.getInstance().getEntityById(c.getKey()).getConcepts());
-            distances.add(1 - (c.getValue() * weightCoeff)); // Similarity for a given distance on map
-//                distances.add(c.getValue()); // Distance on map
-            neighbourhood.add(entityURIs);
-        }
-        SimilarityMatrix similarityMatrix = new SimilarityMatrix(annotation, neighbourhood);
-        BestMatchAverage labels_BMA = new BestMatchAverage(annotation, neighbourhood, distances, ObjectiveFunctionMargin, map, similarityMatrix);
-        finalScore = labels_BMA.labelize();
-        return labels_BMA.getAnnotations();
-    }
-
-    /**
-     *
-     * @param annotation
-     * @param neighbours
-     * @return
-     * @throws SLIB_Ex_Critic
-     * @throws SLIB_Exception
-     */
-    public Set<URI> labelize(LinkedHashSet<URI> annotation, LinkedHashMap<String, Double> neighbours) throws SLIB_Ex_Critic, SLIB_Exception {
 
         ArrayList<LinkedHashSet<URI>> neighbourhood = new ArrayList();
         ArrayList<Double> distances = new ArrayList();

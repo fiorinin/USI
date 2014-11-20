@@ -153,7 +153,7 @@ public class Entity {
     public String toString() {
         String entity = "Item " + id + " with title '" + title + "' and concepts: ";
         for (URI s : concepts) {
-            entity += s.getLocalName() + " ("+Index.getInstance().getEngineManager().getFromURI(s)+") ";
+            entity += s.getLocalName() + " "; // + " ("+Index.getInstance().getEngineManager().getFromURI(s)+") ";
         }
         return entity;
     }

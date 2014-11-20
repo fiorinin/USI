@@ -100,6 +100,16 @@ public class Index {
             removeFromIDF(u);
         }
     }
+    
+    
+    public void clear() {
+        for(Entity en : index) {
+            for (URI u : en.getConcepts()) {
+                removeFromIDF(u);
+            }
+        }
+        index.clear();
+    }
 
     private void addToIDF(URI u) {
         if (idf.containsKey(u)) {
