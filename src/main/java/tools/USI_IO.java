@@ -77,6 +77,8 @@ public class USI_IO {
             data.addParameter("prefix", b+"/");
             GraphLoaderGeneric.populate(data, ontologyGraph);
             removeMeshCycles(ontologyGraph);
+        } else if(gFormat.equals(GFormat.NTRIPLES)) {
+            
         } else {
             b = baseURI;
             URI uri = factory.createURI(b);
@@ -87,7 +89,7 @@ public class USI_IO {
             ih = Indexer_JSON.buildIndex(factory, descriptorPath, b);
         } 
         
-        return new EngineOverlay(ontologyGraph, ontologyFilePath, b, ih);
+        return new EngineOverlay(ontologyGraph, ih);
     }
 
     /*

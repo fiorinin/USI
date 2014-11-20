@@ -96,7 +96,7 @@ public class EngineOverlay {
      * @param ihtmp
      * @throws SLIB_Exception
      */
-    public EngineOverlay(G ontologyGraph, String ontologyFilePath, String b, IndexHash ihtmp) throws SLIB_Exception {
+    public EngineOverlay(G ontologyGraph, IndexHash ihtmp) throws SLIB_Exception {
         URIFactoryMemory factory = URIFactoryMemory.getSingleton();
         sme = new SM_Engine(ontologyGraph);
         ih = ihtmp;

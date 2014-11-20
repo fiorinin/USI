@@ -33,9 +33,14 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>SML</groupId>
-            <artifactId>slib</artifactId>
-            <version>0.0.6</version>
+            <groupId>com.github.sharispe</groupId>
+            <artifactId>slib-sml</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.sharispe</groupId>
+            <artifactId>slib-indexer</artifactId>
+            <version>0.9.1</version>
         </dependency>
     </dependencies>
     <build>

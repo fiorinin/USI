@@ -226,6 +226,10 @@ public class Index {
             }
         }
     }
+    
+    public void init(EngineOverlay EO) {
+        engineManager = EO;
+    }
 
     /**
      *

@@ -44,7 +44,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.openrdf.model.URI;
-import slib.sglib.model.impl.repo.URIFactoryMemory;
+import slib.graph.model.impl.repo.URIFactoryMemory;
 
 /*
  * To change this template, choose Tools | Templates
@@ -66,7 +66,7 @@ public class Utils {
         URIFactoryMemory factory = URIFactoryMemory.getSingleton();
         HashSet<URI> uris = new HashSet();
         for (String s : set) {
-            URI uri = factory.createURI(base + s);
+            URI uri = factory.getURI(base + s);
             uris.add(uri);
         }
         return uris;
