@@ -44,9 +44,9 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openrdf.model.URI;
-import slib.indexer.IndexElementBasic;
+import slib.indexer.URIDescriptionBasic;
 import slib.indexer.IndexHash;
-import slib.sglib.model.impl.repo.URIFactoryMemory;
+import slib.graph.model.impl.repo.URIFactoryMemory;
 
 /**
  *
@@ -67,10 +67,10 @@ public class Indexer_JSON {
                 String val = split[1];
                 
                 String uriConceptAsString = base + key;
-                URI uriConcept = factory.createURI(uriConceptAsString);
+                URI uriConcept = factory.getURI(uriConceptAsString);
 
-                IndexElementBasic i = new IndexElementBasic(uriConcept, val.trim());
-                index.addValue(uriConcept, i);
+                URIDescriptionBasic i = new URIDescriptionBasic(uriConcept, val.trim());
+                index.addDescription(uriConcept, i);
             }
             
             return index;

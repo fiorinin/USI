@@ -40,11 +40,10 @@ import java.util.HashSet;
 import java.util.Set;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDFS;
+import slib.graph.model.graph.G;
+import slib.graph.model.graph.utils.Direction;
+import slib.graph.model.impl.repo.URIFactoryMemory;
 import slib.indexer.IndexHash;
-import slib.indexer.mesh.Indexer_MESH_XML;
-import slib.sglib.model.graph.G;
-import slib.sglib.model.graph.utils.Direction;
-import slib.sglib.model.impl.repo.URIFactoryMemory;
 import slib.sml.sm.core.engine.SM_Engine;
 import slib.utils.ex.SLIB_Ex_Critic;
 import slib.utils.ex.SLIB_Exception;
@@ -83,8 +82,8 @@ public class EngineOverlay {
      * @return
      */
     public String getFromURI(URI u) {
-        if(ih.valuesOf(u) != null)
-            return ih.valuesOf(u).getPreferredDescription();
+        if(ih.getDescription(u) != null)
+            return ih.getDescription(u).getPreferredDescription();
         else return u.getLocalName();
     }
 
@@ -103,8 +102,8 @@ public class EngineOverlay {
         System.out.println("Index of URIs done.");
         Set<URI> uris = sme.getClasses();
         for (URI u : uris) {
-            if (u != null && ih != null && ih.valuesOf(u) != null && ih.valuesOf(u).getPreferredDescription() != null) {
-                labels.put(ih.valuesOf(u).getPreferredDescription().toLowerCase(), u);
+            if (u != null && ih != null && ih.getDescription(u) != null && ih.getDescription(u).getPreferredDescription() != null) {
+                labels.put(ih.getDescription(u).getPreferredDescription().toLowerCase(), u);
             }
         }
         System.out.println("URIs mapped with preferred names.");
@@ -118,7 +117,7 @@ public class EngineOverlay {
      */
     public double calculateGroupwise(Set<URI> set1, Set<URI> set2) {
         try {
-            return sme.computeGroupwiseAddOnSim(MeasuresConf.getAgreg(), MeasuresConf.getMeasure(), set1, set2);
+            return sme.compare(MeasuresConf.getAgreg(), MeasuresConf.getMeasure(), set1, set2);
         } catch (SLIB_Ex_Critic ex) {
             return 0.;
         }
@@ -132,7 +131,7 @@ public class EngineOverlay {
      */
     public double calculatePairwise(URI u1, URI u2) {
         try {
-            return sme.computePairwiseSim(MeasuresConf.getMeasure(), u1, u2);
+            return sme.compare(MeasuresConf.getMeasure(), u1, u2);
         } catch (SLIB_Ex_Critic ex) {
             return 0.;
         }
@@ -163,7 +162,7 @@ public class EngineOverlay {
             Set<URI> neighborURIs = sme.getGraph().getV(currentConceptURI, RDFS.SUBCLASSOF, Direction.BOTH);
             for (URI neighborURI : neighborURIs) {
                 if (!processed.contains(neighborURI)) {
-                    currentSimilarity = sme.computePairwiseSim(MeasuresConf.getMeasure(), startingConceptURI, neighborURI);
+                    currentSimilarity = sme.compare(MeasuresConf.getMeasure(), startingConceptURI, neighborURI);
                     if (currentSimilarity > similarityThreshold) {
                         toBeProcessed.add(neighborURI);
                         results.add(neighborURI);

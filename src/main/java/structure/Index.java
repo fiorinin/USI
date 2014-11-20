@@ -43,7 +43,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.openrdf.model.URI;
 import slib.utils.ex.SLIB_Ex_Critic;
-import tools.IDGetter;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -55,8 +54,8 @@ import org.apache.commons.collections.Predicate;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import slib.sglib.io.util.GFormat;
-import slib.sglib.model.impl.repo.URIFactoryMemory;
+import slib.graph.io.util.GFormat;
+import slib.graph.model.impl.repo.URIFactoryMemory;
 import slib.sml.sm.core.engine.SM_Engine;
 import slib.sml.sm.core.measures.graph.pairwise.dag.node_based.Sim_pairwise_DAG_node_Lin_1998;
 import slib.sml.sm.core.metrics.ic.utils.ICconf;
@@ -209,7 +208,7 @@ public class Index {
                             String base = engineManager.getEngine().getGraph().getURI().stringValue();
                             if(!base.endsWith("/") && !base.endsWith("."))
                                 base += "/";
-                            URI toAdd = URIFactoryMemory.getSingleton().createURI(base + (String) annotation.get(k));
+                            URI toAdd = URIFactoryMemory.getSingleton().getURI(base + (String) annotation.get(k));
                             if(!toAdd.getLocalName().equals(getEngineManager().getFromURI(toAdd)))
                                 conceptSet.add(toAdd);
                         }

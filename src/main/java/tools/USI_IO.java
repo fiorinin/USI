@@ -39,20 +39,19 @@ import java.util.Set;
 import managers.EngineOverlay;
 import org.openrdf.model.URI;
 import org.openrdf.model.vocabulary.RDFS;
+import slib.graph.algo.extraction.utils.GAction;
+import slib.graph.algo.extraction.utils.GActionType;
+import slib.graph.algo.extraction.utils.GraphActionExecutor;
+import slib.graph.algo.extraction.validator.dag.ValidatorDAG;
+import slib.graph.io.conf.GDataConf;
+import slib.graph.io.loader.GraphLoaderGeneric;
+import slib.graph.io.util.GFormat;
+import slib.graph.model.graph.G;
+import slib.graph.model.graph.elements.E;
+import slib.graph.model.graph.utils.Direction;
+import slib.graph.model.impl.graph.memory.GraphMemory;
+import slib.graph.model.impl.repo.URIFactoryMemory;
 import slib.indexer.IndexHash;
-import slib.indexer.mesh.Indexer_MESH_XML;
-import slib.sglib.algo.graph.utils.GAction;
-import slib.sglib.algo.graph.utils.GActionType;
-import slib.sglib.algo.graph.utils.GraphActionExecutor;
-import slib.sglib.algo.graph.validator.dag.ValidatorDAG;
-import slib.sglib.io.conf.GDataConf;
-import slib.sglib.io.loader.GraphLoaderGeneric;
-import slib.sglib.io.util.GFormat;
-import slib.sglib.model.graph.G;
-import slib.sglib.model.graph.elements.E;
-import slib.sglib.model.graph.utils.Direction;
-import slib.sglib.model.impl.graph.memory.GraphMemory;
-import slib.sglib.model.impl.repo.URIFactoryMemory;
 import slib.utils.ex.SLIB_Ex_Critic;
 import slib.utils.ex.SLIB_Exception;
 
@@ -70,18 +69,16 @@ public class USI_IO {
         
         if(gFormat.equals(GFormat.MESH_XML)) {
             b = "http://usi";
-            URI uri = factory.createURI(b);
+            URI uri = factory.getURI(b);
             ontologyGraph = new GraphMemory(uri);
 
             GDataConf data = new GDataConf(gFormat, ontologyFilePath);
             data.addParameter("prefix", b+"/");
             GraphLoaderGeneric.populate(data, ontologyGraph);
             removeMeshCycles(ontologyGraph);
-        } else if(gFormat.equals(GFormat.NTRIPLES)) {
-            
         } else {
             b = baseURI;
-            URI uri = factory.createURI(b);
+            URI uri = factory.getURI(b);
             ontologyGraph = new GraphMemory(uri);
             GDataConf data = new GDataConf(gFormat, ontologyFilePath);
             GraphLoaderGeneric.populate(data, ontologyGraph);
@@ -102,8 +99,8 @@ public class USI_IO {
         URIFactoryMemory factory = URIFactoryMemory.getSingleton();
 
         // We remove the edges creating cycles
-        URI ethicsURI = factory.createURI(meshGraph.getURI().stringValue() + "/D004989");
-        URI moralsURI = factory.createURI(meshGraph.getURI().stringValue() + "/D009014");
+        URI ethicsURI = factory.getURI(meshGraph.getURI().stringValue() + "/D004989");
+        URI moralsURI = factory.getURI(meshGraph.getURI().stringValue() + "/D009014");
 
         // We retrieve the direct subsumers of the concept (D009014)
         Set<E> moralsEdges = meshGraph.getE(RDFS.SUBCLASSOF, moralsURI, Direction.OUT);
@@ -124,8 +121,8 @@ public class USI_IO {
         // We remove the edges creating cycles
         // see http://semantic-measures-library.org/sml/index.php?q=doc&page=mesh
 
-        URI hydroxybutyratesURI = factory.createURI(meshGraph.getURI().stringValue() + "/D006885");
-        URI hydroxybutyricAcidURI = factory.createURI(meshGraph.getURI().stringValue() + "/D020155");
+        URI hydroxybutyratesURI = factory.getURI(meshGraph.getURI().stringValue() + "/D006885");
+        URI hydroxybutyricAcidURI = factory.getURI(meshGraph.getURI().stringValue() + "/D020155");
 
         // We retrieve the direct subsumers of the concept (D009014)
         Set<E> hydroxybutyricAcidEdges = meshGraph.getE(RDFS.SUBCLASSOF, hydroxybutyricAcidURI, Direction.OUT);
