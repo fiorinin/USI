@@ -59,13 +59,9 @@ public class EntityLabelizer {
 
     private Set<URI> A0 = new LinkedHashSet();
     private int filter;
-    private boolean subOntology;
-    private boolean expansion;
+    private boolean includeAncestors = false;
     private int neighboursNumberMin;
-    private int neighboursNumberMax;
     private int spread;
-    private boolean radius;
-    private double radiusWidth;
     private double ObjectiveFunctionMargin;
     private double similarityThreshold;
     private boolean map;
@@ -92,42 +88,10 @@ public class EntityLabelizer {
 
     /**
      *
-     * @param clusterSizeMax
-     */
-    public void setClusterSizeMax(int clusterSizeMax) {
-        this.neighboursNumberMax = clusterSizeMax;
-    }
-
-    /**
-     *
-     * @param radius
-     */
-    public void setRadius(boolean radius) {
-        this.radius = radius;
-    }
-
-    /**
-     *
-     * @param radiusWidth
-     */
-    public void setRadiusWidth(double radiusWidth) {
-        this.radiusWidth = radiusWidth;
-    }
-
-    /**
-     *
      * @param similarityThreshold
      */
     public void setSimilarityThreshold(double similarityThreshold) {
         this.similarityThreshold = similarityThreshold;
-    }
-
-    /**
-     *
-     * @param expansion
-     */
-    public void setExpansion(boolean expansion) {
-        this.expansion = expansion;
     }
 
     /**
@@ -164,6 +128,10 @@ public class EntityLabelizer {
 
     public void setNeighboursNumberMin(int neighboursNumberMin) {
         this.neighboursNumberMin = neighboursNumberMin;
+    }
+
+    public void setIncludeAncestors(boolean includeAncestors) {
+        this.includeAncestors = includeAncestors;
     }
 
     /**
@@ -273,7 +241,10 @@ public class EntityLabelizer {
                 }
             }
         }
-        if (subOntology) {
+        if (includeAncestors) {
+            for(URI u : A0) {
+                A0.addAll(Index.getInstance().getEngineManager().getEngine().getAncestorsInc(u));
+            }
         }
         return A0;
     }
