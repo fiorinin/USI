@@ -42,6 +42,7 @@ import structure.PointDist;
 import structure.SimilarityMatrix;
 import objectivefunction.BestMatchAverage;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -242,7 +243,8 @@ public class EntityLabelizer {
             }
         }
         if (includeAncestors) {
-            for(URI u : A0) {
+            HashSet<URI> A0_tmp = new HashSet(A0);
+            for(URI u : A0_tmp) {
                 A0.addAll(Index.getInstance().getEngineManager().getEngine().getAncestorsInc(u));
             }
         }
