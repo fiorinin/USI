@@ -116,7 +116,9 @@ public class BestMatchAverage {
             validConcepts.addAll(similarityMatrix.getValidConcepts());
             for (int idToRemove : validConcepts) {
                 similarityMatrix.removeValidConcept(idToRemove);
+//                System.out.print(similarityMatrix.getValidConceptsURI());
                 double similarity = computeScore();
+//                System.out.println(" = "+similarity);
                 similarityMatrix.restoreLastRemovedConcept();
 
                 if (bestRemove < 0 || similarity > betterScore) {
@@ -163,7 +165,6 @@ public class BestMatchAverage {
         for (int idToRemove : orderedConcepts.keySet()) {
             similarityMatrix.removeValidConcept(idToRemove);
             double similarity = computeScore();
-
             if (similarity > betterScore || (similarity <= betterScore && Math.abs(similarity - betterScore) / betterScore <= objectiveFunctionMargin)) {
                 betterScore = similarity;
             } else {
@@ -188,6 +189,7 @@ public class BestMatchAverage {
             similarity += s;
         }
         double cardA = similarityMatrix.getValidConcepts().size();
-        return (similarity / i) - objectiveFunctionMargin * cardA;
+//        return (similarity / i) - objectiveFunctionMargin * cardA;
+        return (similarity / i) - objectiveFunctionMargin * cardA - objectiveFunctionMargin * ((1/cardA) * similarityMatrix.getSumICs());
     }
 }

@@ -41,6 +41,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openrdf.model.URI;
 import slib.sml.sm.core.engine.SM_Engine;
 import slib.sml.sm.core.measures.graph.pairwise.dag.node_based.Sim_pairwise_DAG_node_Lin_1998;
@@ -404,6 +406,18 @@ public class SimilarityMatrix {
                 BMAData.updateSumMaxRowValue(delta);
             }
         }
+    }
+    
+    public double getSumICs() {
+        double sum = 0;
+        for(URI c : getValidConceptsURI()) {
+            try {
+                sum += engine.getIC(ICconf, c);
+            } catch (SLIB_Exception ex) {
+                Logger.getLogger(SimilarityMatrix.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return sum;
     }
 
     /**
