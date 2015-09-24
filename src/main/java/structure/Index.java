@@ -219,8 +219,9 @@ public class Index {
                             if(!base.endsWith("/") && !base.endsWith("."))
                                 base += "/";
                             URI toAdd = URIFactoryMemory.getSingleton().getURI(base + (String) annotation.get(k));
-                            if(!toAdd.getLocalName().equals(getEngineManager().getFromURI(toAdd)))
+                            if(!toAdd.getLocalName().equals(engineManager.getFromURI(toAdd))) {
                                 conceptSet.add(toAdd);
+                            }
                         }
                         Entity en = new Entity();
                         en.setId(id);

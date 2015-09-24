@@ -60,6 +60,9 @@ public class SimilarityMatrix {
 
     private ArrayList<URI> A0;
     private ArrayList<Integer> validConcepts;
+    private ArrayList<Double> allICs;
+    private double sumICs;
+    private double lastRemovedIC;
     private ArrayList<URI> neighbours;
     private ArrayList<DocBMAData> BMADatas;
     private ArrayList<ArrayList<DocBMAData>> conceptIDToDocID;
@@ -227,6 +230,7 @@ public class SimilarityMatrix {
 
         this.validConcepts = new ArrayList();
         this.BMADatas = new ArrayList();
+        this.allICs = new ArrayList();
         idColMaxForThisRow = new int[neighbours.size()];
         sim_annotation_entities = new double[A0.size()][neighbours.size()];
         columnIndex = new HashMap();
@@ -239,6 +243,7 @@ public class SimilarityMatrix {
             URI conceptCol = A0.get(c_i);
             columnIndex.put(conceptCol, c_i);
             validConcepts.add(c_i);
+            allICs.add(engine.getIC(ICconf, conceptCol));
             for (int r_i = 0; r_i < neighbours.size(); r_i++) {
                 URI conceptRow = neighbours.get(r_i);
                 rowIndex.put(conceptRow, r_i);
@@ -259,6 +264,10 @@ public class SimilarityMatrix {
             }
         }
         BMAs = new double[BMADatas.size()];
+        sumICs = 0;
+        for(double ic : allICs) {
+            sumICs += ic;
+        }
     }
 
     private void init() throws SLIB_Ex_Critic, SLIB_Exception {
@@ -330,26 +339,6 @@ public class SimilarityMatrix {
         }
     }
 
-    /**
-     *
-     * @param toRemove
-     * @throws SLIB_Exception
-     */
-    public void removeValidConcept(int toRemove) throws SLIB_Exception {
-        lastRemovedConcept = toRemove;
-        modifiedIdColMax.clear();
-        validConcepts.remove((Integer) toRemove);
-        for (int r_i = 0; r_i < idColMaxForThisRow.length; r_i++) {
-            if (idColMaxForThisRow[r_i] == toRemove) {
-                updateIdColMax(r_i, conceptIDToDocID.get(r_i), true);
-                modifiedIdColMax.add(r_i); // Saves the concerned rows
-            }
-        }
-        for (DocBMAData BMAData : BMADatas) {
-            BMAData.updateSumMaxCol(toRemove, true);
-        }
-    }
-
     // Updates the idColMaxForThisRow for a given row and updates corresponding docs
     /**
      *
@@ -375,7 +364,29 @@ public class SimilarityMatrix {
         }
     }
 
-    //restore concept after a test of removal
+    /**
+     *
+     * @param toRemove
+     * @throws SLIB_Exception
+     */
+    public void removeValidConcept(int toRemove) throws SLIB_Exception {
+        lastRemovedConcept = toRemove;
+        modifiedIdColMax.clear();
+        validConcepts.remove((Integer) toRemove);
+        for (int r_i = 0; r_i < idColMaxForThisRow.length; r_i++) {
+            if (idColMaxForThisRow[r_i] == toRemove) {
+                updateIdColMax(r_i, conceptIDToDocID.get(r_i), true);
+                modifiedIdColMax.add(r_i); // Saves the concerned rows
+            }
+        }
+        for (DocBMAData BMAData : BMADatas) {
+            BMAData.updateSumMaxCol(toRemove, true);
+        }
+        // Update sumICs
+        lastRemovedIC = allICs.get(toRemove);
+        sumICs -= lastRemovedIC;
+    }
+
     /**
      *
      * @throws SLIB_Exception
@@ -388,6 +399,8 @@ public class SimilarityMatrix {
         for (DocBMAData BMAData : BMADatas) {
             BMAData.updateSumMaxCol(lastRemovedConcept, false);
         }
+        // Update sumICs
+        sumICs += lastRemovedIC;
     }
 
     /**
@@ -409,15 +422,16 @@ public class SimilarityMatrix {
     }
     
     public double getSumICs() {
-        double sum = 0;
-        for(URI c : getValidConceptsURI()) {
-            try {
-                sum += engine.getIC(ICconf, c);
-            } catch (SLIB_Exception ex) {
-                Logger.getLogger(SimilarityMatrix.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return sum;
+//        double sum = 0;
+//        for(URI c : getValidConceptsURI()) {
+//            try {
+//                sum += engine.getIC(ICconf, c);
+//            } catch (SLIB_Exception ex) {
+//                Logger.getLogger(SimilarityMatrix.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+//        return sum;
+        return sumICs;
     }
 
     /**

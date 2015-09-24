@@ -95,7 +95,7 @@ public class EngineOverlay {
      * @param ihtmp
      * @throws SLIB_Exception
      */
-    public EngineOverlay(G ontologyGraph, IndexHash ihtmp) throws SLIB_Exception {
+    public EngineOverlay(G ontologyGraph, IndexHash ihtmp, boolean flex) throws SLIB_Exception {
         URIFactoryMemory factory = URIFactoryMemory.getSingleton();
         sme = new SM_Engine(ontologyGraph);
         ih = ihtmp;
@@ -104,6 +104,9 @@ public class EngineOverlay {
         for (URI u : uris) {
             if (u != null && ih != null && ih.getDescription(u) != null && ih.getDescription(u).getPreferredDescription() != null) {
                 labels.put(ih.getDescription(u).getPreferredDescription().toLowerCase(), u);
+            }
+            else if (u != null && ih != null && flex) {
+                labels.put(u.getLocalName().toLowerCase().replace("synset-", ""), u);
             }
         }
         System.out.println("URIs mapped with preferred names.");

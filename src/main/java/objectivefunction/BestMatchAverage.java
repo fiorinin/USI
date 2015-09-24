@@ -57,6 +57,7 @@ public class BestMatchAverage {
     private LinkedHashSet<URI> annotations;
     private double objectiveFunctionMargin;
     private boolean map;
+    private boolean clustering;
     private Set<URI> trueAnnot;
     SimilarityMatrix similarityMatrix;
 
@@ -87,9 +88,10 @@ public class BestMatchAverage {
      * @throws SLIB_Ex_Critic
      * @throws SLIB_Exception
      */
-    public BestMatchAverage(LinkedHashSet<URI> ann, ArrayList<LinkedHashSet<URI>> neighb, ArrayList<Double> d, double ObjectiveFunctionMargin, boolean map, SimilarityMatrix simMatrix) throws SLIB_Ex_Critic, SLIB_Exception {
+    public BestMatchAverage(LinkedHashSet<URI> ann, ArrayList<LinkedHashSet<URI>> neighb, ArrayList<Double> d, double ObjectiveFunctionMargin, boolean map, SimilarityMatrix simMatrix, boolean log) throws SLIB_Ex_Critic, SLIB_Exception {
         similarityMatrix = simMatrix;
         this.map = map;
+        this.clustering = log;
         distances = d;
         neighbourhood = neighb;
         this.objectiveFunctionMargin = ObjectiveFunctionMargin;
@@ -183,13 +185,26 @@ public class BestMatchAverage {
         double[] sims = similarityMatrix.getBMA();
 
         double similarity = 0;
+        double logs = 0;
         int i;
         for (i = 0; i < sims.length; i++) {
             double s = sims[i];
-            similarity += s;
+            if (clustering) {
+                double logtmp = Math.log10(distances.get(i));
+                similarity += logtmp*s;
+                logs += logtmp;
+            }
+            else
+                similarity += s;
         }
-        double cardA = similarityMatrix.getValidConcepts().size();
-//        return (similarity / i) - objectiveFunctionMargin * cardA;
-        return (similarity / i) - objectiveFunctionMargin * cardA - objectiveFunctionMargin * ((1/cardA) * similarityMatrix.getSumICs());
+        // Classical indexing
+        if(!clustering) {
+            double cardA = similarityMatrix.getValidConcepts().size();
+            return (similarity / i) - objectiveFunctionMargin * cardA;
+        }
+        
+        // Clustering
+//        return (similarity / i) - objectiveFunctionMargin * similarityMatrix.getSumICs();
+        return (similarity/logs) - objectiveFunctionMargin * similarityMatrix.getSumICs();
     }
 }

@@ -66,6 +66,7 @@ public class EntityLabelizer {
     private double ObjectiveFunctionMargin;
     private double similarityThreshold;
     private boolean map;
+    private boolean clustering;
     private double weightCoeff;
     private LinkedHashMap<String, Double> neighbours = new LinkedHashMap();
     private LinkedHashMap<String, Double> extendedNeighbours = new LinkedHashMap();
@@ -109,6 +110,14 @@ public class EntityLabelizer {
      */
     public void setMap(boolean map) {
         this.map = map;
+    }
+
+    /**
+     *
+     * @param log
+     */
+    public void setClustering(boolean clustering) {
+        this.clustering = clustering;
     }
 
     /**
@@ -268,12 +277,12 @@ public class EntityLabelizer {
         for (Entry<String, Double> c : neighbours.entrySet()) {
             LinkedHashSet<URI> entityURIs = new LinkedHashSet();
             entityURIs.addAll(Index.getInstance().getEntityById(c.getKey()).getConcepts());
-            distances.add(1 - (c.getValue() * weightCoeff)); // Similarity for a given distance on map
-//                distances.add(c.getValue()); // Distance on map
+//            distances.add(1 - (c.getValue() * weightCoeff)); // Similarity for a given distance on map
+            distances.add(c.getValue()); // Distance on map
             neighbourhood.add(entityURIs);
         }
         SimilarityMatrix similarityMatrix = new SimilarityMatrix(annotation, neighbourhood);
-        BestMatchAverage labels_BMA = new BestMatchAverage(annotation, neighbourhood, distances, ObjectiveFunctionMargin, map, similarityMatrix);
+        BestMatchAverage labels_BMA = new BestMatchAverage(annotation, neighbourhood, distances, ObjectiveFunctionMargin, map, similarityMatrix,clustering);
         finalScore = labels_BMA.labelize();
         return labels_BMA.getAnnotations();
     }
@@ -295,7 +304,7 @@ public class EntityLabelizer {
             neighbourhood.add(entityURIs);
         }
         SimilarityMatrix similarityMatrix = new SimilarityMatrix(trueAnnot, neighbourhood);
-        BestMatchAverage labels_BMA = new BestMatchAverage(trueAnnot, neighbourhood, distances, ObjectiveFunctionMargin, map, similarityMatrix);
+        BestMatchAverage labels_BMA = new BestMatchAverage(trueAnnot, neighbourhood, distances, ObjectiveFunctionMargin, map, similarityMatrix, clustering);
         return labels_BMA.computeScore();
     }
 }

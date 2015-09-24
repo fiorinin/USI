@@ -52,6 +52,7 @@ import slib.graph.model.graph.utils.Direction;
 import slib.graph.model.impl.graph.memory.GraphMemory;
 import slib.graph.model.impl.repo.URIFactoryMemory;
 import slib.indexer.IndexHash;
+import slib.indexer.mesh.Indexer_MESH_XML;
 import slib.utils.ex.SLIB_Ex_Critic;
 import slib.utils.ex.SLIB_Exception;
 
@@ -75,6 +76,7 @@ public class USI_IO {
             GDataConf data = new GDataConf(gFormat, ontologyFilePath);
             data.addParameter("prefix", b+"/");
             GraphLoaderGeneric.populate(data, ontologyGraph);
+            ih = Indexer_MESH_XML.buildIndex(factory, ontologyFilePath, b + "/");
             removeMeshCycles(ontologyGraph);
         } else {
             b = baseURI;
@@ -83,10 +85,11 @@ public class USI_IO {
             GDataConf data = new GDataConf(gFormat, ontologyFilePath);
             GraphLoaderGeneric.populate(data, ontologyGraph);
             GraphActionExecutor.applyAction(factory, new GAction(GActionType.REROOTING), ontologyGraph);
-            ih = Indexer_JSON.buildIndex(factory, descriptorPath, b);
-        } 
+            if (gFormat.equals(GFormat.NTRIPLES))
+                ih = Indexer_JSON.buildIndex(factory, descriptorPath, b);
+        }
         
-        return new EngineOverlay(ontologyGraph, ih);
+        return new EngineOverlay(ontologyGraph, ih, false);
     }
 
     /*
